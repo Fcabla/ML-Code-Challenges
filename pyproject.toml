@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "ml-code-challenges"
+version = "0.1.0"
+description = "ML code challenges from deep-ml.com"
+authors = ["Fcabla <fer_nando_cb@hotmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+numpy = "^2.1.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "N801", "N802", "N804", "N805"]
+ignore = ['E501', 'N803']
