@@ -8,9 +8,6 @@ from bs4 import BeautifulSoup
 base_url = "https://www.deep-ml.com"
 pages_to_scrape = [1, 2, 3]
 
-# Dictionary to store the extracted data
-problems_data = {}
-
 
 def fetch_with_retry(url, max_retries=5, timeout=30):
     for attempt in range(max_retries):
@@ -27,7 +24,7 @@ def fetch_with_retry(url, max_retries=5, timeout=30):
 
 
 # Function to scrape a single page
-def scrape_page(page_num):
+def scrape_page(page_num, problems_data):
     url = f"{base_url}/?page={page_num}"
     # response = requests.get(url)
     response = fetch_with_retry(url, max_retries=5, timeout=30)
@@ -63,19 +60,11 @@ def scrape_page(page_num):
                     }
     else:
         print(f"Failed to retrieve page {page_num}")
-
-
-# Loop through each page and scrape data
-for page in pages_to_scrape:
-    scrape_page(page)
-
-# Save problems index dict
-with open("data/problems_index.json", "w") as outfile:
-    json.dump(problems_data, outfile)
+    return problems_data
 
 
 # Function to scrape a single problem page
-def scrape_problem_page(problem_id):
+def scrape_problem_page(problem_id, problems_data):
     problem_url = problems_data[problem_id]["url"]
     # response = requests.get(problem_url)
     response = fetch_with_retry(problem_url, max_retries=5, timeout=30)
@@ -125,13 +114,11 @@ def scrape_problem_page(problem_id):
     else:
         print(f"Failed to retrieve page {problem_url}")
         return None
+    return problems_data
 
 
-out_path = "src/unsolved"
-# Loop the dict and create the correspondent python file
-for problem_id in problems_data.keys():
-    time.sleep(2)
-    scrape_problem_page(problem_id)
+def save_problem(problem_id, problems_data, out_path="src/unsolved"):
+    scrape_problem_page(problem_id, problems_data)
     details = problems_data[problem_id]
     problem = f'''
 """
@@ -169,3 +156,26 @@ if __name__ == "__main__":
     out_file = f"{out_path}/{details['category']}/{problem_id}_{details['title']}.py"
     with open(out_file, "w", encoding="utf-8") as file:
         file.write(problem)
+
+
+def main():
+    # Dictionary to store the extracted data
+    problems_data = {}
+
+    # Loop through each page and scrape data
+    for page in pages_to_scrape:
+        problems_data = scrape_page(page, problems_data)
+
+    # Save problems index dict
+    with open("data/problems_index.json", "w") as outfile:
+        json.dump(problems_data, outfile)
+
+    out_path = "src/unsolved"
+    # Loop the dict and create the correspondent python file
+    for problem_id in problems_data.keys():
+        time.sleep(2)
+        save_problem(problem_id, problems_data, out_path=out_path)
+
+
+if __name__ == "__main__":
+    main()
