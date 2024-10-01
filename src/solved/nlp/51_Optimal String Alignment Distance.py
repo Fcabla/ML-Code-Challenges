@@ -52,7 +52,6 @@ For example, the OSA distance between the string "caper", and "acer" will be 2. 
 def osa(source: str, target: str) -> int:
     # Your code here
     # https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance
-    pass
     source_len, target_len = len(source), len(target)
     # Set resulting object all to 0s
     d = [[0] * (target_len + 1) for _ in range(source_len + 1)]
